@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2017
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Curves And Splines", "Curves And Splines.csproj", "{9650D298-B31A-FEB9-20F8-1442A73DD4BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Curves And Splines.Editor", "Curves And Splines.Editor.csproj", "{FD2DDAC5-39A5-1579-12EA-CF98021D1BF0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9650D298-B31A-FEB9-20F8-1442A73DD4BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9650D298-B31A-FEB9-20F8-1442A73DD4BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9650D298-B31A-FEB9-20F8-1442A73DD4BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9650D298-B31A-FEB9-20F8-1442A73DD4BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD2DDAC5-39A5-1579-12EA-CF98021D1BF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD2DDAC5-39A5-1579-12EA-CF98021D1BF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD2DDAC5-39A5-1579-12EA-CF98021D1BF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD2DDAC5-39A5-1579-12EA-CF98021D1BF0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
