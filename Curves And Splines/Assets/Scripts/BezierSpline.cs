@@ -3,54 +3,81 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+public enum BezierControlPointMode
+{
+    Free,
+    Aligned,
+    Mirrored
+}
 public class BezierSpline : MonoBehaviour {
 
+    //vector point array
     [SerializeField]
-    public CurveVectors[] vectorChain;
-  
-    public int pointCount
+    private Vector3[] points;
+    //parallel point mode array
+    [SerializeField]
+    private BezierControlPointMode[] modes;
+
+
+
+    public int ControlPointCount
     {
         get
         {
-            return vectorChain.Length * 4;
+            return points.Length;
         }
     }
 
+
     public Vector3 GetControlPoint(int index)
     {
-        return vectorChain[index / 4][index % 4];
+        return points[index];
     }
 
     public void SetControlPoint(int index, Vector3 point)
     {
-        vectorChain[index / 4][index % 4] = point;
+        points[index] = point;
     }
+
+    //number of curve segment in spline
+    public int CurveCount
+    {
+        get
+        {
+            return (points.Length - 1) / 3;
+        }
+    }
+
     public void Reset()
     {
-        vectorChain = new CurveVectors[]
-        {new CurveVectors( new Vector3(1f,0f,0f), new Vector3(2f,0f,0f),
-        new Vector3(3f,0f,0f),new Vector3(4f,0f,0f))};
+        points = new Vector3[] {
+            new Vector3(1f, 0f, 0f),
+            new Vector3(2f, 0f, 0f),
+            new Vector3(3f, 0f, 0f),
+            new Vector3(4f, 0f, 0f)
+        };
     }
 
+    //return vector of curve at interpolation point 0 < t < 1
     public Vector3 GetPoint(float t)
     {
-        //return transform.TransformPoint(Bezier.GetPoint(vectorChain[0], t));
-
         int i;
-        if(t >= 1f)
+        if (t >= 1f)
         {
             t = 1f;
-            i = vectorChain.Length - 1;
+            i = points.Length - 4;
         }
         else
         {
-            t = Mathf.Clamp01(t) * vectorChain.Length;
+            t = Mathf.Clamp01(t) * CurveCount;
             i = (int)t;
             t -= i;
+            i *= 3;
         }
-
-        return transform.TransformPoint(Bezier.GetPoint(vectorChain[i], t));
+        return transform.TransformPoint(Bezier.CalculatePoint(
+            points[i], points[i + 1], points[i + 2], points[i + 3], t));
     }
+
 
     public Vector3 GetVelocity(float t)
     {
@@ -58,15 +85,17 @@ public class BezierSpline : MonoBehaviour {
         if (t >= 1f)
         {
             t = 1f;
-            i = vectorChain.Length - 1;
+            i = points.Length - 4;
         }
         else
         {
-            t = Mathf.Clamp01(t) * vectorChain.Length;
+            t = Mathf.Clamp01(t) * CurveCount;
             i = (int)t;
             t -= i;
+            i *= 3;
         }
-        return transform.TransformPoint(Bezier.GetFirstDerivative(vectorChain[i], t)) - transform.position;
+        return transform.TransformPoint(Bezier.GetFirstDerivative(
+            points[i], points[i + 1], points[i + 2], points[i + 3], t)) - transform.position;
     }
 
     public Vector3 GetDirection(float t)
@@ -74,16 +103,21 @@ public class BezierSpline : MonoBehaviour {
         return GetVelocity(t).normalized;
     }
 
+
+
     public void AddCurve()
     {
-        Vector3 point = vectorChain[vectorChain.Length - 1].p3;
-        Array.Resize(ref vectorChain, vectorChain.Length + 1);
-        vectorChain[vectorChain.Length - 1].p0 = point;
+        Vector3 point = points[points.Length - 1];
+        Array.Resize(ref points, points.Length + 3);
         point.x += 1f;
-        vectorChain[vectorChain.Length - 1].p1 = point;
+        points[points.Length - 3] = point;
         point.x += 1f;
-        vectorChain[vectorChain.Length - 1].p2 = point;
+        points[points.Length - 2] = point;
         point.x += 1f;
-        vectorChain[vectorChain.Length - 1].p3 = point;
+        points[points.Length - 1] = point;
+
+        //resise pointmose array
+        Array.Resize(ref modes, modes.Length + 1);
+        modes[modes.Length - 1] = modes[modes.Length - 2];
     }
 }
