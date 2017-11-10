@@ -5,8 +5,26 @@ using System;
 
 public class BezierSpline : MonoBehaviour {
 
+    [SerializeField]
     public CurveVectors[] vectorChain;
   
+    public int pointCount
+    {
+        get
+        {
+            return vectorChain.Length * 4;
+        }
+    }
+
+    public Vector3 GetControlPoint(int index)
+    {
+        return vectorChain[index / 4][index % 4];
+    }
+
+    public void SetControlPoint(int index, Vector3 point)
+    {
+        vectorChain[index / 4][index % 4] = point;
+    }
     public void Reset()
     {
         vectorChain = new CurveVectors[]

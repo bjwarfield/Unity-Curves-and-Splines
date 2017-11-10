@@ -66,6 +66,7 @@ public struct CurveVectors
     //index operator override
     public Vector3 this[int key]
     {
+        
         get
         {
             switch(key)
@@ -78,7 +79,9 @@ public struct CurveVectors
                     return this.p2;
                 case 3:
                     return this.p3;
-                default: return Vector3.zero;
+                //default: return Vector3.zero;
+                default: throw new System.ArgumentOutOfRangeException("Index for curve vector out of range.");
+
 
             }
         }
@@ -94,8 +97,10 @@ public struct CurveVectors
                     this.p2 = value; break;
                 case 3:
                     this.p3 = value; break;
+                default: throw new System.ArgumentOutOfRangeException("Index for curve vector out of range.");
+
             }
-            
+
         }
     }
 
