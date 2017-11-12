@@ -81,6 +81,7 @@
     <Compile Include="Assets\Scripts\BezierCurve.cs" />
     <Compile Include="Assets\Scripts\BezierSpline.cs" />
     <Compile Include="Assets\Scripts\Line.cs" />
+    <Compile Include="Assets\Scripts\SplineWalker.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
