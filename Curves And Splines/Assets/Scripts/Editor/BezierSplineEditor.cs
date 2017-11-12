@@ -111,7 +111,7 @@ public class BezierSplineEditor : Editor {
 
         if (selectedIndex >= 0 && selectedIndex < spline.ControlPointCount)
         {
-            DrawSelectedPointInslector();
+            DrawSelectedPointInspector();
         }
 
         if (GUILayout.Button("Add Curve"))
@@ -120,9 +120,21 @@ public class BezierSplineEditor : Editor {
             spline.AddCurve();
             EditorUtility.SetDirty(spline);
         }
+
+        //if (selectedIndex >= 0 && selectedIndex < spline.ControlPointCount && spline.CurveCount > 1)
+        if (spline.CurveCount > 1)
+        {
+            if (GUILayout.Button("Remove Curve")) 
+            {
+                Undo.RecordObject(spline, "Remove Curve");
+                spline.RemoveCurve(selectedIndex);
+                EditorUtility.SetDirty(spline);
+            }
+        }
+        Repaint();
     }
 
-    private void DrawSelectedPointInslector()
+    private void DrawSelectedPointInspector()
     {
         GUILayout.Label("Selected Point");
         EditorGUI.BeginChangeCheck();

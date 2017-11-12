@@ -140,13 +140,20 @@ public class BezierSpline : MonoBehaviour {
 
     public Vector3 GetDistancePoint(float distance)
     {
+
+        
         //collect distances of spline segments
         float[] lengths = GetLengths();
         //get the total distace of the spline
         float totalDistance = lengths[lengths.Length - 1];
 
+        if(closedLoop)
+        {
+            distance = distance % totalDistance;
+        }
+
         //negative distance returns a point on a tangent to the first line segment scales to the negative distance
-        if(distance < 0)
+        if (distance < 0)
         {
             return transform.TransformPoint(Bezier.CalculatePoint(
             points[0], points[1], points[2], points[3], 0)) + GetDirection(0) * (distance - totalDistance);
@@ -167,16 +174,16 @@ public class BezierSpline : MonoBehaviour {
         while (index < lengths.Length - 1 && lengths[index + 1] < distance) index++;
 
         float lerpScale = Mathf.InverseLerp(lengths[index], lengths[index + 1], distance);
-        int curveIndex = index / linesPerCurve;
+        int curveIndex = (index / linesPerCurve) * 3;
 
-        Vector3 p0 = points[3 * curveIndex];
-        Vector3 p1 = points[3 * curveIndex + 1];
-        Vector3 p2 = points[3 * curveIndex + 2];
-        Vector3 p3 = points[3 * curveIndex + 3];
+        Vector3 p0 = points[curveIndex];
+        Vector3 p1 = points[curveIndex + 1];
+        Vector3 p2 = points[curveIndex + 2];
+        Vector3 p3 = points[curveIndex + 3];
 
         return transform.TransformPoint(
             Vector3.Lerp(Bezier.CalculatePoint(p0, p1, p2, p3, (float)(index % linesPerCurve) / (float)linesPerCurve),
-            Bezier.CalculatePoint(p0, p1, p2, p3, (float)((index % linesPerCurve) +1) / (float)linesPerCurve),
+            Bezier.CalculatePoint(p0, p1, p2, p3, (float)((index % linesPerCurve) + 1f) / (float)linesPerCurve),
             lerpScale)
             );
     }
@@ -218,7 +225,7 @@ public class BezierSpline : MonoBehaviour {
         point.x += 1f;
         points[points.Length - 1] = point;
 
-        //resise pointmose array
+        //resise pointmode array
         Array.Resize(ref modes, modes.Length + 1);
         modes[modes.Length - 1] = modes[modes.Length - 2];
         EnforceMode(points.Length - 4);
@@ -231,6 +238,20 @@ public class BezierSpline : MonoBehaviour {
             EnforceMode(0);
         }
     }
+
+    public void RemoveCurve(int index)
+    {
+        if(CurveCount <= 1)
+        {
+            return;
+        }
+
+        Array.Resize(ref points, points.Length - 3);
+        //resize pointmode array
+        Array.Resize(ref modes, modes.Length - 1);
+        
+    }
+
 
     public BezierControlPointMode GetControlPointMode (int index)
     {
