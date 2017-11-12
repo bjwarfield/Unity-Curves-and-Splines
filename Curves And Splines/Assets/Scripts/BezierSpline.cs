@@ -31,7 +31,7 @@ public class BezierSpline : MonoBehaviour {
         set
         {
             closedLoop = value;
-            if(value == true)
+            if (value == true)
             {
                 modes[modes.Length - 1] = modes[0];
                 SetControlPoint(0, points[0]);
@@ -82,6 +82,11 @@ public class BezierSpline : MonoBehaviour {
     public Vector3 GetLerpPoint(float t)
     {
         int i;
+        if (ClosedLoop)
+        {
+            t = t % 1f;
+        }
+
         if (t >= 1f)
         {
             t = 1f;
@@ -94,10 +99,87 @@ public class BezierSpline : MonoBehaviour {
             t -= i;
             i *= 3;
         }
+
+
         return transform.TransformPoint(Bezier.CalculatePoint(
             points[i], points[i + 1], points[i + 2], points[i + 3], t));
     }
 
+    private const int linesPerCurve = 16;
+    private float[] GetLengths()
+    {
+        //create list of lengths for each line segment in spline
+        float[] lengths = new float[CurveCount * (linesPerCurve) ];
+        //distance trackers
+        float totalDistance = 0;
+        float distance = 0;
+
+        //start at first segment, proceed to second to last segment
+        for(int i = 0; i < CurveCount; i++)
+        {
+            Vector3 p0 = points[3 * i];
+            Vector3 p1 = points[3 * i + 1];
+            Vector3 p2 = points[3 * i + 2];
+            Vector3 p3 = points[3 * i + 3];
+            for (int j = 0; j < linesPerCurve; j++)
+            {
+                //set coresponding array element to the distance
+                lengths[(i * linesPerCurve) + j] = totalDistance;
+                
+                //calculate the next distance
+                distance = Vector3.Distance(Bezier.CalculatePoint(p0, p1, p2, p3, (float)j / (float) linesPerCurve), Bezier.CalculatePoint(p0, p1, p2, p3, (float)(j+1) / (float)linesPerCurve));
+                totalDistance += distance;
+            }
+            
+        }
+
+        //put the final total in the last element of the array
+        lengths[lengths.Length - 1] = totalDistance;
+        return lengths;
+    }
+
+    public Vector3 GetDistancePoint(float distance)
+    {
+        //collect distances of spline segments
+        float[] lengths = GetLengths();
+        //get the total distace of the spline
+        float totalDistance = lengths[lengths.Length - 1];
+
+        //negative distance returns a point on a tangent to the first line segment scales to the negative distance
+        if(distance < 0)
+        {
+            return transform.TransformPoint(Bezier.CalculatePoint(
+            points[0], points[1], points[2], points[3], 0)) + GetDirection(0) * (distance - totalDistance);
+        }
+
+        //distance greater than the total distance returns a point on a tangent to the last line segment scaled to the overshot distance
+        if (distance > totalDistance)
+        {
+            return transform.TransformPoint(Bezier.CalculatePoint(
+            points[points.Length - 4],
+            points[points.Length - 3], 
+            points[points.Length - 2], 
+            points[points.Length - 1], 1)) + GetDirection(1f) * (distance - totalDistance);
+        }
+
+        //find the line segment
+        int index = 0;
+        while (index < lengths.Length - 1 && lengths[index + 1] < distance) index++;
+
+        float lerpScale = Mathf.InverseLerp(lengths[index], lengths[index + 1], distance);
+        int curveIndex = index / linesPerCurve;
+
+        Vector3 p0 = points[3 * curveIndex];
+        Vector3 p1 = points[3 * curveIndex + 1];
+        Vector3 p2 = points[3 * curveIndex + 2];
+        Vector3 p3 = points[3 * curveIndex + 3];
+
+        return transform.TransformPoint(
+            Vector3.Lerp(Bezier.CalculatePoint(p0, p1, p2, p3, (float)(index % linesPerCurve) / (float)linesPerCurve),
+            Bezier.CalculatePoint(p0, p1, p2, p3, (float)((index % linesPerCurve) +1) / (float)linesPerCurve),
+            lerpScale)
+            );
+    }
 
     public Vector3 GetVelocity(float t)
     {

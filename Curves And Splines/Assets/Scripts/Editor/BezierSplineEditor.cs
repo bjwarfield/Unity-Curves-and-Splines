@@ -13,7 +13,7 @@ public class BezierSplineEditor : Editor {
     private Quaternion handleRotation;
 
     //curve granularity, # of steps per curve
-    private const int lineSteps = 16;
+    //private const int lineSteps = 16;
     private const float directionScale = 2f;
 
     private void OnSceneGUI()
