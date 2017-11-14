@@ -127,7 +127,7 @@ public class BezierSplineEditor : Editor {
             if (GUILayout.Button("Remove Curve")) 
             {
                 Undo.RecordObject(spline, "Remove Curve");
-                spline.RemoveCurve(selectedIndex);
+                spline.RemoveCurve();
                 EditorUtility.SetDirty(spline);
             }
         }
